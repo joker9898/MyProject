@@ -3,24 +3,14 @@
 @{
 	Layout = "master.cshtml";
 
-	// ── Content Nodes (GUID ဖြင့် ဆွဲ) ──────────────────────────────────────
-	var mainProducts = Umbraco.Content(Guid.Parse("513b1e17-78a1-4431-9f93-409c35af373a"));
 	var newsAndEvents = Umbraco.Content(Guid.Parse("5de81975-a4ae-4273-9493-05f3a7cd4d63"));
 	var whoWeAre = Umbraco.Content(Guid.Parse("302304a3-c395-4de3-86d3-fb78e5c9a125"));
 
-	// ── Home Page Fields ──────────────────────────────────────────────────────
 	var heroTitle = Model.Value<string>("title") ?? "Welcome";
 	var heroDescription = Model.Value<string>("description") ?? "";
 	var heroBanner = Model.Value<IPublishedContent>("bannerImage");
 
-	// ── What We Do — MainProducts ရဲ့ child items (3 ခုထိပဲပြမည်) ─────────
-	var serviceItems = mainProducts?
-		.Children()
-		.Where(x => x.IsVisible())
-		.Take(3)
-		?? Enumerable.Empty<IPublishedContent>();
-
-	// ── Latest News — NewsAndEvents ရဲ့ child items (3 ခုထိပဲပြမည်) ────────
+	// Latest News 3 ခု ယူခြင်း
 	var newsItems = newsAndEvents?
 		.Children()
 		.Where(x => x.IsVisible())
@@ -28,9 +18,7 @@
 		?? Enumerable.Empty<IPublishedContent>();
 }
 
-@* ══════════════════════════════════════════════════════════
-   ၁။ HERO SECTION
-   ══════════════════════════════════════════════════════════ *@
+@* 1. HERO SECTION *@
 <section class="home-hero" style="background-image: url('@(heroBanner != null ? heroBanner.Url() : "")')">
 	<div class="home-hero-overlay"></div>
 	<div class="container home-hero-content">
@@ -43,110 +31,30 @@
 	</div>
 </section>
 
-@* ══════════════════════════════════════════════════════════
-   ၂။ WHAT WE DO SECTION
-   ══════════════════════════════════════════════════════════ *@
+@* 2. WHAT WE DO (From Custom API) *@
 <section class="home-section">
 	<div class="container">
-
 		<div class="home-section-header">
-			<h2 class="home-section-title">What We Do</h2>
-			<a href="@(mainProducts?.Url() ?? "#")" class="home-view-all">View All →</a>
+			<h2 class="home-section-title">Our Services (API)</h2>
 		</div>
-
-		<div class="home-card-grid">
-			@if (serviceItems.Any())
-			{
-				@foreach (var item in serviceItems)
-				{
-					var img = item.Value<IPublishedContent>("image");
-					var desc = item.Value<string>("description") ?? "";
-					var plain = System.Text.RegularExpressions.Regex.Replace(desc, "<.*?>", "");
-
-					<div class="home-card">
-						<a href="@item.Url()" class="home-card-img-wrap">
-							@if (img != null)
-							{
-								<img src="@img.Url()" alt="@item.Name" class="home-card-img" />
-							}
-							else
-							{
-								<div class="home-card-img-placeholder">
-									<i class="fa fa-image"></i>
-								</div>
-							}
-						</a>
-						<div class="home-card-body">
-							<h3 class="home-card-title">
-								<a href="@item.Url()">@item.Name</a>
-							</h3>
-							<p class="home-card-desc">
-								@(plain.Length > 100 ? plain.Substring(0, 100) + "..." : plain)
-							</p>
-							<a href="@item.Url()" class="home-card-link">LEARN MORE →</a>
-						</div>
-					</div>
-				}
-			}
-			else
-			{
-				<p class="home-empty">No services found.</p>
-			}
+		<div id="api-data-list" class="home-card-grid">
+			<p>Loading services...</p>
 		</div>
-
 	</div>
 </section>
 
-@* ══════════════════════════════════════════════════════════
-   ၃။ LATEST NEWS SECTION
-   ══════════════════════════════════════════════════════════ *@
+@* 3. LATEST NEWS SECTION (From CMS) *@
 <section class="home-section home-section-gray">
 	<div class="container">
-
 		<div class="home-section-header">
-			<h2 class="home-section-title">Latest News &amp; Events</h2>
-			<a href="@(newsAndEvents?.Url() ?? "#")" class="home-view-all">View All →</a>
+			<h2 class="home-section-title">Latest News & Events</h2>
+			<a href="@(newsAndEvents?.Url() ?? "#")" class="home-view-all">View All &rarr;</a>
 		</div>
 
-		<div class="home-card-grid">
-			@if (newsItems.Any())
-			{
-				@foreach (var item in newsItems)
-				{
-					var img = item.Value<IPublishedContent>("image");
-					var desc = item.Value<string>("description") ?? "";
-					var plain = System.Text.RegularExpressions.Regex.Replace(desc, "<.*?>", "");
-
-					<div class="home-card">
-						<a href="@item.Url()" class="home-card-img-wrap">
-							@if (img != null)
-							{
-								<img src="@img.Url()" alt="@item.Name" class="home-card-img" />
-							}
-							else
-							{
-								<div class="home-card-img-placeholder">
-									<i class="fa fa-newspaper"></i>
-								</div>
-							}
-						</a>
-						<div class="home-card-body">
-							<h3 class="home-card-title">
-								<a href="@item.Url()">@item.Name</a>
-							</h3>
-							<p class="home-card-desc">
-								@(plain.Length > 100 ? plain.Substring(0, 100) + "..." : plain)
-							</p>
-							<a href="@item.Url()" class="home-card-link">READ MORE →</a>
-						</div>
-					</div>
-				}
-			}
-			else
-			{
-				<p class="home-empty">No news found.</p>
-			}
+		<div id="news-data-list" class="home-card-grid">
+			<p>Loading news...</p>
 		</div>
 
+		<div id="news-pagination" style="text-align: center; margin-top: 30px; margin-bottom: 30px;"></div>
 	</div>
 </section>

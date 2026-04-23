@@ -2,4 +2,38 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
 	Layout = "master.cshtml";
+    
+	var newsTitle = Model.Name;
+	var description = Model.Value("description");
+	var newsImage = Model.Value<IPublishedContent>("bannerImage");
+    
+	// သတင်းတင်တဲ့ ရက်စွဲကို ယူမယ်
+	var newsDate = Model.CreateDate.ToString("dd MMMM yyyy");
 }
+
+<div class="container section-container">
+	<div class="item-detail-container"
+		 style="background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto;">
+        
+		<a href="@(Model.Parent != null ? Model.Parent.Url() : "/")"
+			   style="text-decoration: none; color: #c0392b; font-weight: bold; display: inline-block; margin-bottom: 20px;">
+			&larr; Back to News & Events
+		</a>
+        
+		<h1 style="color: #2c3e50; font-weight: 800; margin-bottom: 10px;">@newsTitle</h1>
+		<p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">
+			<i class="fa fa-calendar-alt"></i> Published on: @newsDate
+		</p>
+        
+		@if (newsImage != null)
+		{
+			<img src="@newsImage.Url()" alt="@newsTitle"
+				 style="width: 100%; max-height: 450px; object-fit: cover; border-radius: 8px; margin-bottom: 30px;" />
+		}
+        
+		<div style="font-size: 1.1em; line-height: 1.8; color: #444;">
+			@Html.Raw(description)
+		</div>
+
+	</div>
+</div>

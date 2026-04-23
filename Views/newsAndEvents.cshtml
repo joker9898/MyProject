@@ -24,8 +24,8 @@
 
     <div class="grid-container">
         @foreach(var child in Model.Children())
-        {
-            var childImage = child.Value<IPublishedContent>("image"); 
+            {
+                var childImage = child.Value<IPublishedContent>("bannerImage"); 
             var childDesc = child.Value<string>("description");
 
             <div class="card">

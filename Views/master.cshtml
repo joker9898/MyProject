@@ -9,15 +9,20 @@
     
     // What We Do (MainProducts) ရဲ့ အောက်က child items များကို ဆွဲထုတ်ခြင်း
     var subServices = MainProducts?.Children().Where(x => x.IsVisible()) ?? Enumerable.Empty<IPublishedContent>();
-
     var currentId = Context.Request.Query["id"].ToString();
-    var enUrl = Model.Url("en-US", mode: UrlMode.Absolute);
-    var bmUrl = Model.Url("my-MM", mode: UrlMode.Absolute);
+
+    var enUrl = Model.Url("en-US");
+    // အကယ်၍ English URL က # ဖြစ်နေရင် Default (Home) ကို သွားမယ်
+    if (string.IsNullOrEmpty(enUrl) || enUrl == "#") { enUrl = "/"; }
+
+    var bmUrl = Model.Url("my-MM");
+    // BM URL ရှာမတွေ့ရင်လည်း Default အနေနဲ့ ထားမယ် (သင့် BM လမ်းကြောင်းအတိုင်း ပြင်နိုင်ပါတယ်)
+    if (string.IsNullOrEmpty(bmUrl) || bmUrl == "#") { bmUrl = "/my-MM/"; }
 
     if (!string.IsNullOrWhiteSpace(currentId))
     {
-        enUrl += $"?id={currentId}";
-        bmUrl += $"?id={currentId}";
+        enUrl += (enUrl.Contains("?") ? "&" : "?") + $"id={currentId}";
+        bmUrl += (bmUrl.Contains("?") ? "&" : "?") + $"id={currentId}";
     }
 
     var _HomeUrl = Home?.Url() ?? "#";
@@ -93,12 +98,7 @@
                 </div>
             </header>
 
-            <main class="container py-5">
-                <div class="container my-5">
-                    <h3>Our Services (From Custom API)</h3>
-                    <div id="api-data-list" class="row">
-                    </div>
-                </div>
+            <main class="main-content">
                 @RenderBody()
             </main>
 
@@ -197,9 +197,9 @@
                     if (langButton && langList) {
                     langButton.addEventListener('click', function (e) {
                     e.preventDefault();
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                 
-                    langList.classList.toggle('show'); 
+                    langList.classList.toggle('show');
                 
                     // မြှားလေးကို အပေါ်/အောက် လှည့်မယ်
                     const langIcon = this.querySelector('.fa-angle-down');
@@ -220,31 +220,146 @@
                     }
                     });
                     }
+                    // ====================================================================
+                    // ၁။ Our Services ကို API ကနေ ဆွဲထုတ်မည့် Function
+                    // ====================================================================
                     async function fetchServicesFromAPI() {
                     try {
                     const response = await fetch('/umbraco/api/services/getservices');
                     const services = await response.json();
-        
+
                     const listContainer = document.getElementById('api-data-list');
                     if (listContainer) {
+                    listContainer.innerHTML = '';
                     services.forEach(item => {
                     listContainer.innerHTML += `
-                    <div class="col-md-4 mb-3">
-                    <div class="card p-3 shadow-sm">
-                    <h5>${item.name}</h5>
-                    <div>${item.description}</div>
+                    <div class="home-card">
+                    <div class="home-card-body">
+                    <h3 class="home-card-title">
+                    <a href="${item.url}">${item.name}</a>
+                    </h3>
+                    <p class="home-card-desc" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    ${item.description ? item.description.replace(/<[^>]*>?/gm, '') : ''}
+                    </p>
+                    <a href="${item.url}" class="home-card-link">LEARN MORE →</a>
                     </div>
                     </div>
                     `;
                     });
                     }
                     } catch (err) {
-                    console.error("API Call Error:", err);
+                    console.error("Services API Call Error:", err);
                     }
                     }
 
-                    // Page တက်လာရင် API ကို လှမ်းခေါ်မယ်
-                    fetchServicesFromAPI();
+                    // ====================================================================
+                    // ၂။ Latest News များကို API ကနေ ဆွဲထုတ်မည့် Function
+                    // ====================================================================
+                    // ====================================================================
+                    // ၂။ Latest News များကို API ကနေ ဆွဲထုတ်မည့် Function (Pagination ပါဝင်သည်)
+                    // ====================================================================
+                    let currentNewsPage = 1;
+
+                    async function fetchNewsFromAPI(page = 1) {
+                    try {
+                    currentNewsPage = page;
+                    // C# ကနေ လက်ရှိ Website ရဲ့ Language (en-US သို့မဟုတ် my-MM) ကို ဆွဲယူမယ်
+                    const currentLang = '@System.Threading.Thread.CurrentThread.CurrentCulture.Name';
+
+                    // API ကို page နံပါတ်ရော၊ language ပါ ပူးတွဲပြီး လှမ်းပို့မယ်
+                    const response = await fetch(`/umbraco/api/servicesapi/getnews?page=${page}&lang=${currentLang}`);
+                    const data = await response.json();
+
+                    const newsContainer = document.getElementById('news-data-list');
+                    if (!newsContainer) return; // Home page မဟုတ်ရင် ဘာမှမလုပ်ဘဲ ရပ်မည်
+
+                    newsContainer.innerHTML = '';
+        
+                    if (data.newsItems && data.newsItems.length > 0) {
+                    data.newsItems.forEach(news => {
+                    const imgTag = news.imageUrl
+                    ? `<img src="${news.imageUrl}" alt="${news.title}" class="home-card-img" />`
+                    : `<div class="home-card-img-placeholder"><i class="fa fa-newspaper"></i></div>`;
+
+                    newsContainer.innerHTML += `
+                    <div class="home-card">
+                    <a href="${news.url}" class="home-card-img-wrap">
+                    ${imgTag}
+                    </a>
+                    <div class="home-card-body">
+                    <h3 class="home-card-title">
+                    <a href="${news.url}">${news.title}</a>
+                    </h3>
+                    <p class="home-card-desc" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    ${news.description ? news.description.replace(/<[^>]*>?/gm, '') : ''}
+                    </p>
+                    <a href="${news.url}" class="home-card-link">READ MORE →</a>
+                    </div>
+                    </div>
+                    `;
+                    });
+            
+                    // ခလုတ်များ ဖန်တီးမည်
+                    renderPaginationControls(data.totalPages);
+                    }
+                    } catch (err) {
+                    console.error("News API Error:", err);
+                    }
+                    }
+
+                    function renderPaginationControls(totalPages) {
+                    // Pagination Container ရှိမရှိ ရှာမယ်၊ မရှိရင် JS ကနေ အလိုအလျောက် အသစ်ဆောက်မယ်
+                    let paginationContainer = document.getElementById('news-pagination');
+                    if (!paginationContainer) {
+                    paginationContainer = document.createElement('div');
+                    paginationContainer.id = 'news-pagination';
+                    paginationContainer.style.textAlign = 'center';
+                    paginationContainer.style.marginTop = '30px';
+                    paginationContainer.style.width = '100%';
+        
+                    // News Grid ရဲ့ အောက်မှာ သွားကပ်မယ်
+                    const newsContainer = document.getElementById('news-data-list');
+                    newsContainer.parentNode.insertBefore(paginationContainer, newsContainer.nextSibling);
+                    }
+
+                    paginationContainer.innerHTML = ''; // အဟောင်းတွေဖျက်မယ်
+
+                    // စာမျက်နှာ ၁ မျက်နှာထက် များမှ ခလုတ်တွေ ပြမယ်
+                    if (totalPages > 1) {
+                    // Prev ခလုတ်
+                    const prevBtn = document.createElement('button');
+                    prevBtn.innerText = '← Prev';
+                    prevBtn.className = 'btn btn-outline-danger';
+                    prevBtn.style.margin = '0 5px';
+                    prevBtn.disabled = currentNewsPage === 1;
+                    prevBtn.onclick = () => fetchNewsFromAPI(currentNewsPage - 1);
+                    paginationContainer.appendChild(prevBtn);
+
+                    // စာမျက်နှာ နံပါတ် ခလုတ်များ (၁၊ ၂၊ ၃ ...)
+                    for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.innerText = i;
+                    pageBtn.className = currentNewsPage === i ? 'btn btn-danger' : 'btn btn-outline-danger';
+                    pageBtn.style.margin = '0 5px';
+                    pageBtn.onclick = () => fetchNewsFromAPI(i);
+                    paginationContainer.appendChild(pageBtn);
+                    }
+
+                    // Next ခလုတ်
+                    const nextBtn = document.createElement('button');
+                    nextBtn.innerText = 'Next →';
+                    nextBtn.className = 'btn btn-outline-danger';
+                    nextBtn.style.margin = '0 5px';
+                    nextBtn.disabled = currentNewsPage === totalPages;
+                    nextBtn.onclick = () => fetchNewsFromAPI(currentNewsPage + 1);
+                    paginationContainer.appendChild(nextBtn);
+                    }
+                    }
+
+                    // Function တွေ စတင် Run မည် (ဒါလေး အောက်ဆုံးမှာ ရှိဖို့ သေချာပါစေ)
+                    fetchServicesFromAPI(); // Services အတွက်
+                    fetchNewsFromAPI(1);    // News အတွက်
+
                 </script>
             </body>
 
