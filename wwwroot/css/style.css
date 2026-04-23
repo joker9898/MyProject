@@ -382,8 +382,218 @@ ul {
 }
 
 /* ==========================================================================
-   ၆။ Mobile Responsive (Media Query)
+   ၇။ Home Page Sections
    ========================================================================== */
+
+/* ── Hero ── */
+.home-hero {
+    position: relative;
+    min-height: 480px;
+    background-size: cover;
+    background-position: center;
+    background-color: #1a2a3a;
+    display: flex;
+    align-items: center;
+}
+
+.home-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.home-hero-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    max-width: 700px;
+    padding: 60px 15px;
+}
+
+.home-hero-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.home-hero-desc {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 30px;
+    line-height: 1.7;
+}
+
+.home-hero-btn {
+    display: inline-block;
+    background: #b82a2a;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background 0.3s;
+}
+
+.home-hero-btn:hover {
+    background: #8c1a1a;
+    color: #fff;
+}
+
+/* ── Sections ── */
+.home-section {
+    padding: 70px 0;
+}
+
+.home-section-gray {
+    background-color: #f5f5f5;
+}
+
+.home-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.home-section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 3px solid #b82a2a;
+}
+
+.home-view-all {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #b82a2a;
+}
+
+.home-view-all:hover {
+    color: #8c1a1a;
+}
+
+/* ── Card Grid ── */
+.home-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.home-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #efefef;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.home-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.home-card-img-wrap {
+    display: block;
+    overflow: hidden;
+    height: 210px;
+}
+
+.home-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+
+.home-card:hover .home-card-img {
+    transform: scale(1.05);
+}
+
+.home-card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+    font-size: 2rem;
+}
+
+.home-card-body {
+    padding: 22px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.home-card-title a {
+    color: inherit;
+}
+
+.home-card-title a:hover {
+    color: #b82a2a;
+}
+
+.home-card-desc {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.6;
+    flex-grow: 1;
+    margin-bottom: 15px;
+}
+
+.home-card-link {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #b82a2a;
+    letter-spacing: 0.5px;
+}
+
+.home-card-link:hover {
+    color: #8c1a1a;
+}
+
+.home-empty {
+    color: #888;
+    padding: 20px 0;
+}
+
+/* ── Home Responsive ── */
+@media screen and (max-width: 900px) {
+    .home-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .home-hero-title {
+        font-size: 1.9rem;
+    }
+    .home-card-grid {
+        grid-template-columns: 1fr;
+    }
+    .home-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
 @media screen and (max-width: 768px) {
     .site-header {
         padding: 10px 20px;
