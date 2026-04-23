@@ -1,0 +1,26 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "master.cshtml"; 
+
+    var title = Model.Value<string>("title");
+    var bodyText = Model.Value<string>("content"); 
+    var headerImage = Model.Value<IPublishedContent>("bannerImage"); 
+}
+
+<div class="container section-container">
+
+    @if (headerImage != null)
+    {
+        <img src="@headerImage.Url()" alt="@title" class="full-banner" />
+    }
+
+    <h2 class="section-title" style="border: none; padding: 0; margin-bottom: 20px;">
+        @(string.IsNullOrEmpty(title) ? Model.Name : title)
+    </h2>
+
+    <div class="content-body">
+        @Html.Raw(bodyText)
+    </div>
+
+</div>

@@ -1,0 +1,101 @@
+﻿@using SixLabors.ImageSharp
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using static System.Net.Mime.MediaTypeNames
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = "master.cshtml";
+
+    var title = Model.Value<string>("title");
+    var description = Model.Value<string>("description");
+    var home = Umbraco.Content(Guid.Parse("d89f2040-900d-4216-8467-620d3fde1e1c"));
+    var image = Model.Value<IPublishedContent>("image");
+    
+    // လက်ရှိ page ရဲ့ children (Service Items) များကို ယူခြင်း
+    var children = Model.Children().Where(x => x.IsVisible());
+}
+
+<div style="margin-bottom: 20px;">
+    <a href="@(home != null ? home.Url() : "/")"
+           style="text-decoration: none; color: #3498db; font-weight: bold; padding: 8px 15px; background-color: #e8f4fd; border-radius: 5px; display: inline-block;">
+        &larr; Back to Home
+    </a>
+</div>
+
+<div class="hero-banner"
+     style="background-image: url('@(image != null ? image.Url() : "")'); background-size: cover; background-position: center; padding: 60px 20px; color: white; border-radius: 8px; margin-bottom: 40px; position: relative; overflow: hidden; min-height: 250px;">
+    
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1;">
+    </div>
+    
+    <div style="position: relative; z-index: 2; text-align: left; max-width: 800px;">
+        <h1 style="font-size: 2.8em; margin-bottom: 15px; color: #fff;">
+            @(string.IsNullOrEmpty(title) ? Model.Name : title)
+        </h1>
+        
+        <div style="font-size: 1.1em; line-height: 1.6; color: #eaeaea;">
+            @Html.Raw(description)
+        </div>
+    </div>
+</div>
+
+<h2 style="color: #c0392b; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+    @Model.Name
+</h2>
+
+<div class="product-grid" style="display: flex; gap: 25px; flex-wrap: wrap;">
+    
+    @if (children.Any())
+    {
+        
+        @foreach (var child in children)
+        {
+            // Property Alias များကို သတိထားရန် (Service Item ထဲက Alias နှင့် တူရပါမည်)
+            var childImage = child.Value<IPublishedContent>("image"); // 'image' မှ 'mainImage' သို့ ပြင်ထားသည်
+            var childDesc = child.Value<string>("description");
+
+            <div class="product-card"
+                 style="border: 1px solid #e0e0e0; border-radius: 10px; width: calc(33.333% - 17px); background: #fff; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; min-width: 280px;">
+            
+                <a href="@child.Url()" style="display: block;">
+                    @if (childImage != null)
+                    {
+                        <img src="@childImage.Url()" alt="@child.Name"
+                             style="width: 100%; height: 220px; object-fit: cover; margin: 0; border-bottom: 1px solid #eee;" />
+                    }
+                    else
+                    {
+                        <div
+                            style="width: 100%; height: 220px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                            <i class="fa fa-image" style="font-size: 2em; margin-bottom: 10px;"></i> No Image
+                        </div>
+                    }
+                </a>
+            
+                <div style="padding: 20px;">
+                    <h3 style="font-size: 1.3em; margin-bottom: 10px; margin-top: 0;">
+                        <a href="@child.Url()" style="text-decoration: none; color: #2c3e50; font-weight: bold;">
+                            @child.Name
+                        </a>
+                    </h3>
+                
+                    <div
+                        style="color: #666; font-size: 0.95em; line-height: 1.5; margin-bottom: 15px; height: 4.5em; overflow: hidden;">
+                        @if (!string.IsNullOrEmpty(childDesc))
+                        {
+                            var plainText = System.Text.RegularExpressions.Regex.Replace(childDesc, "<.*?>", String.Empty);
+                            @(plainText.Length > 100 ? plainText.Substring(0, 100) + "..." : plainText)
+                        }
+                    </div>
+
+                    <a href="@child.Url()" style="color: #c0392b; font-weight: bold; text-decoration: none; font-size: 0.9em;">
+                        LEARN MORE &rarr;
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p style="padding: 20px; color: #888;">No services or products found under this section.</p>
+    }
+</div>

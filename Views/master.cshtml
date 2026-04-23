@@ -1,0 +1,251 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    var Home = Umbraco.Content("d89f2040-900d-4216-8467-620d3fde1e1c");
+    var MainProducts = Umbraco.Content("513b1e17-78a1-4431-9f93-409c35af373a");
+    var whoWeAre = Umbraco.Content("302304a3-c395-4de3-86d3-fb78e5c9a125");
+    var NewsAndEvents = Umbraco.Content("5de81975-a4ae-4273-9493-05f3a7cd4d63");
+    
+    // What We Do (MainProducts) ရဲ့ အောက်က child items များကို ဆွဲထုတ်ခြင်း
+    var subServices = MainProducts?.Children().Where(x => x.IsVisible()) ?? Enumerable.Empty<IPublishedContent>();
+
+    var currentId = Context.Request.Query["id"].ToString();
+    var enUrl = Model.Url("en-US", mode: UrlMode.Absolute);
+    var bmUrl = Model.Url("my-MM", mode: UrlMode.Absolute);
+
+    if (!string.IsNullOrWhiteSpace(currentId))
+    {
+        enUrl += $"?id={currentId}";
+        bmUrl += $"?id={currentId}";
+    }
+
+    var _HomeUrl = Home?.Url() ?? "#";
+    var _MainUrl = MainProducts?.Url() ?? "#";
+    var _whoWeAreUrl = whoWeAre?.Url() ?? "#";
+    var _NewsAndEventsUrl = NewsAndEvents?.Url() ?? "#";
+}
+<!DOCTYPE html>
+<html lang="@(Model.GetCultureFromDomains() == "my-MM" ? "my" : "en")">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Project Test</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="bg-light">
+    <header class="site-header">
+        <div class="container header-content d-flex justify-content-between align-items-center">
+            <div class="logo-section">
+                <a href="@_HomeUrl" class="logo-link text-decoration-none">
+                    <h2 class="logo-text">My Project Logos</h2>
+                </a>
+            </div>
+
+            <button class="menu-toggle d-md-none" id="menuToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="main-nav" id="mainNav">
+                <ul class="nav-list d-flex align-items-center list-unstyled mb-0">
+                    <li><a href="@_whoWeAreUrl" class="nav-link">WHO WE ARE</a></li>
+                    
+                    <li class="has-dropdown position-relative">
+                        <a href="@_MainUrl" class="nav-link">
+                            WHAT WE DO <i class="fa fa-angle-down ms-1"></i>
+                        </a>
+                        @if (subServices.Any())
+                        {
+                            <ul class="dropdown-menu-custom list-unstyled shadow-sm">
+                                @foreach (var item in subServices)
+                                {
+                                    <li><a href="@item.Url()" class="text-decoration-none d-block">@item.Name</a></li>
+                                }
+                            </ul>
+                        }
+                    </li>
+
+                    <li><a href="@_NewsAndEventsUrl" class="nav-link">NEWS & EVENTS</a></li>
+                    <li><a href="#" class="nav-link">PUBLICATIONS</a></li>
+                    <li><a href="#" class="nav-link">CONTACT US</a></li>
+
+                    <li class="lang-dropdown list-unstyled ms-3">
+                        <button class="lang-button d-flex align-items-center">
+                            <img src="https://flagcdn.com/w20/@(Model.GetCultureFromDomains() == "my-MM" ? "mm" : "us").png"
+                                 alt="flag" class="me-2">
+                            <span>@(Model.GetCultureFromDomains() == "my-MM" ? "BM" : "EN")</span>
+                            <i class="fa fa-angle-down ms-2"></i>
+                        </button>
+                        <ul class="lang-list list-unstyled shadow-sm">
+                            <li><a href="@enUrl" class="text-decoration-none"><img src="https://flagcdn.com/w20/us.png"
+                                                                                       alt="en" class="me-2"> English</a></li>
+                                <li><a href="@bmUrl" class="text-decoration-none"><img src="https://flagcdn.com/w20/mm.png"
+                                                                                           alt="mm" class="me-2"> ဗမာစာ</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+
+            <main class="container py-5">
+                <div class="container my-5">
+                    <h3>Our Services (From Custom API)</h3>
+                    <div id="api-data-list" class="row">
+                    </div>
+                </div>
+                @RenderBody()
+            </main>
+
+            <footer class="site-footer bg-dark text-white py-5">
+                <div class="container footer-container">
+                    <div class="row">
+                        <div class="col-md-8 footer-left">
+                            <div class="footer-logo mb-4">
+                                <h1 class="footer-logo-text display-5 fw-bold">adpc</h1>
+                                <p class="small">Asian Disaster Preparedness Center</p>
+                            </div>
+                            <p class="footer-copy small mb-2">&copy; 2026 Asian Disaster Preparedness Center (ADPC). All Rights
+                                Reserved.</p>
+                                <p class="footer-disclaimer small opacity-75">
+                                    The information provided on this Web site is not official U.S. Government information and does
+                                    not represent the views...
+                                </p>
+                            </div>
+                            <div class="col-md-4 footer-right text-md-end">
+                                <div class="footer-links mb-3">
+                                    <a href="#" class="text-white text-decoration-none me-3">Sign up</a>
+                                    <a href="#" class="text-white text-decoration-none">Careers</a>
+                                </div>
+                                <div class="social-icons mb-3">
+                                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                                    <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                                </div>
+                                <div class="footer-bottom-link">
+                                    <a href="#" class="text-white small text-decoration-underline">Privacy & Terms of Use</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                    // 1. Highlight Active Link
+                    const currentPath = window.location.pathname;
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    }
+                    });
+
+                    // 2. Mobile Main Menu Toggle Logic
+                    const menuToggle = document.getElementById('menuToggle');
+                    const mainNav = document.getElementById('mainNav');
+        
+                    if (menuToggle && mainNav) {
+                    menuToggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    mainNav.classList.toggle('active');
+                    this.classList.toggle('is-active');
+                    });
+
+                    document.addEventListener('click', function (e) {
+                    if (!mainNav.contains(e.target) && !menuToggle.contains(e.target)) {
+                    mainNav.classList.remove('active');
+                    menuToggle.classList.remove('is-active');
+                    }
+                    });
+                    }
+
+                    // 3. Mobile Dropdown Toggle Logic (အသစ်ထပ်ဖြည့်ထားသောအပိုင်း)
+                    const dropdownLinks = document.querySelectorAll('.has-dropdown > a');
+                    dropdownLinks.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                    // ဖုန်း screen (768px နဲ့အောက်) ဆိုရင်ပဲ ဒီ logic အလုပ်လုပ်မယ်
+                    if (window.innerWidth <= 768) {
+                    e.preventDefault(); // Link သွားတာကို ခဏရပ်မယ်
+                    
+                    // သူ့အောက်က dropdown menu ကို ရှာမယ်
+                    const submenu = this.nextElementSibling;
+                    const icon = this.querySelector('.fa-angle-down');
+
+                    if (submenu && submenu.classList.contains('dropdown-menu-custom')) {
+                    submenu.classList.toggle('show'); // Menu ကို အဖွင့်/အပိတ် လုပ်မယ်
+                        
+                    // မြှားလေးကို အထက်/အောက် လှည့်မယ်
+                    if (icon) {
+                    icon.style.transform = submenu.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    icon.style.transition = 'transform 0.3s ease';
+                    }
+                    }
+                    }
+                    });
+                    });
+                    });
+                    // 3. Language Dropdown Toggle (Desktop & Mobile နှစ်မျိုးလုံးအတွက်)
+                    const langButton = document.querySelector('.lang-button');
+                    const langList = document.querySelector('.lang-list');
+
+                    if (langButton && langList) {
+                    langButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // အပြင်ကို နှိပ်မိသလို မဖြစ်အောင် တားမယ်
+                
+                    langList.classList.toggle('show'); // နှိပ်ရင် အဖွင့်/အပိတ် လုပ်မယ်
+                
+                    // မြှားလေးကို အပေါ်/အောက် လှည့်မယ်
+                    const langIcon = this.querySelector('.fa-angle-down');
+                    if (langIcon) {
+                    langIcon.style.transform = langList.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    langIcon.style.transition = 'transform 0.3s ease';
+                    }
+                    });
+
+                    // Dropdown ပြင်ပကို နှိပ်လိုက်ရင် အလိုအလျောက် ပိတ်သွားအောင် လုပ်မယ်
+                    document.addEventListener('click', function (event) {
+                    if (!langButton.contains(event.target) && !langList.contains(event.target)) {
+                    langList.classList.remove('show');
+                    const langIcon = langButton.querySelector('.fa-angle-down');
+                    if (langIcon) {
+                    langIcon.style.transform = 'rotate(0deg)';
+                    }
+                    }
+                    });
+                    }
+                    async function fetchServicesFromAPI() {
+                    try {
+                    const response = await fetch('/umbraco/api/services/getservices');
+                    const services = await response.json();
+        
+                    const listContainer = document.getElementById('api-data-list');
+                    if (listContainer) {
+                    services.forEach(item => {
+                    listContainer.innerHTML += `
+                    <div class="col-md-4 mb-3">
+                    <div class="card p-3 shadow-sm">
+                    <h5>${item.name}</h5>
+                    <div>${item.description}</div>
+                    </div>
+                    </div>
+                    `;
+                    });
+                    }
+                    } catch (err) {
+                    console.error("API Call Error:", err);
+                    }
+                    }
+
+                    // Page တက်လာရင် API ကို လှမ်းခေါ်မယ်
+                    fetchServicesFromAPI();
+                </script>
+            </body>
+
+        </html>

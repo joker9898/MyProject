@@ -1,0 +1,15 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "master.cshtml";
+	var name = Model.Value("title");
+	var MainProducts = Umbraco.Content(Guid.Parse("513b1e17-78a1-4431-9f93-409c35af373a"));
+	var whoWeAre = Umbraco.Content(Guid.Parse("513b1e17-78a1-4431-9f93-409c35af373a"));
+	var _MainProductsUrl = MainProducts.Url("302304a3-c395-4de3-86d3-fb78e5c9a125");
+
+	
+	
+}
+
+@name
+@Model.Value("description")
