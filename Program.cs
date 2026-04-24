@@ -1,4 +1,3 @@
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -8,11 +7,12 @@ builder.CreateUmbracoBuilder()
     .AddComposers()
     .Build();
 
+
+
+
 WebApplication app = builder.Build();
 
-
 await app.BootUmbracoAsync();
-
 
 app.UseUmbraco()
     .WithMiddleware(u =>
@@ -25,5 +25,8 @@ app.UseUmbraco()
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });
+
+
+
 
 await app.RunAsync();

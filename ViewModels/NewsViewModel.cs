@@ -1,20 +1,28 @@
 namespace MyProject.Models
 {
-    // သတင်းတစ်ပုဒ်ချင်းစီအတွက် လိုအပ်တဲ့ အချက်အလက်များ
     public class NewsItemData
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string Url { get; set; }
-        public string ImageUrl { get; set; }
-        public string Date { get; set; }
+        public string title { get; set; } = string.Empty;
+        public string description { get; set; } = string.Empty;
+        public string url { get; set; } = string.Empty;
+        public string imageUrl { get; set; } = string.Empty;
+        public string date { get; set; } = string.Empty;
+        public string published { get; set; } = string.Empty;
+        public string lastUpdate { get; set; } = string.Empty;
+        public string imageResourceUrl { get; set; } = string.Empty;
+        public string illustrationBackground { get; set; } = string.Empty;
+        public string titleNews { get; set; } = string.Empty;
     }
 
-    // API ကနေ အုပ်စုလိုက် ပြန်ပို့ပေးမယ့် Data ထုပ်ကြီး (Pagination အတွက်ပါ ပါတယ်)
     public class SearchViewModelData
     {
-        public int CurrentPage { get; set; }
-        public int TotalPages { get; set; }
-        public List<NewsItemData> NewsItems { get; set; } = new List<NewsItemData>();
+        public SearchViewModelData()
+        {
+            this.NewsItemData = new List<NewsItemData>();
+        }
+        public long TotalRecords { get; set; }
+        public decimal TotalPages { get; set; }
+        public long CurrentPage { get; set; }
+        public List<NewsItemData> NewsItemData { get; set; }
     }
 }

@@ -1,57 +1,37 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using Umbraco.Cms.Core.Models.PublishedContent
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-    Layout = "master.cshtml"; 
-    var title = Model.Value<string>("title");
-    var headerImage = Model.Value<IPublishedContent>("bannerImage"); 
+    Layout = "master.cshtml";
+    var title = Model.Value<string>("title") ?? Model.Name;
+    var bannerImage = Model.Value<IPublishedContent>("bannerImage");
+}
+
+@* Banner Image *@
+@if (bannerImage != null)
+{
+    <div class="full-banner" style="height:250px;">
+        <img src="@bannerImage.Url()" alt="@title" class="hero-bg-img" />
+    </div>
 }
 
 <div class="container section-container">
-    
-    @if (headerImage != null)
-{
-    <div class="full-banner" style="height: 250px;"> 
-        <img src="@headerImage.Url()" alt="News Banner" class="hero-bg-img" />
-    </div>
-}
 
-    <div class="title-bar">
-        <h2 class="section-title" style="border: none; margin: 0;">
-            @(string.IsNullOrEmpty(title) ? Model.Name : title)
-        </h2>
-        <a href="#" class="btn-filter">Filter &#x25BC;</a>
+    <div class="home-section-header mb-4">
+        <h2 class="home-section-title">@title</h2>
     </div>
 
-    <div class="grid-container">
-        @foreach(var child in Model.Children())
-            {
-                var childImage = child.Value<IPublishedContent>("bannerImage"); 
-            var childDesc = child.Value<string>("description");
-
-            <div class="card">
-                <a href="@child.Url()" class="card-link">
-                    @if(childImage != null)
-                    {
-                        <img src="@childImage.Url()" alt="@child.Name" />
-                    }
-                    else
-                    {
-                        <div class="card-img-placeholder">No Image</div>
-                    }
-                </a>
-                <div class="card-body">
-                    <h3 class="card-title">
-                        <a href="@child.Url()">@child.Name</a>
-                    </h3>
-                    <p class="text-content" style="font-size: 0.95em;">
-                        @if (!string.IsNullOrEmpty(childDesc))
-                        {
-                            var plainText = System.Text.RegularExpressions.Regex.Replace(childDesc, "<.*?>", String.Empty);
-                            @(plainText.Length > 80 ? plainText.Substring(0, 80) + "..." : plainText)
-                        }
-                    </p>
-                </div>
-            </div>
-        }
+    @* Cards — JS ဖြင့် inject ဖြစ်မည် *@
+    <div class="home-card-grid" id="news-result-container">
+        <p class="home-empty">Loading news...</p>
     </div>
+
+    @* Pagination — JS ဖြင့် inject ဖြစ်မည် *@
+    <div id="news-pagination" class="d-flex justify-content-center mt-4 flex-wrap gap-1">
+    </div>
+
 </div>
+
+@* News_List.js ကို ဤ page တွင်သာ load မည် *@
+@section Scripts {
+    <script src="/js/News_List.js"></script>
+}

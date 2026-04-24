@@ -8,31 +8,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Umbraco.Extensions;
+using MyProject.Models;
 
 namespace MyProject.Controllers
 {
-    // ======================================================
-    //  ViewModels for News Pagination
-    // ======================================================
-    public class NewsItemData
-    {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
-        public string Date { get; set; } = string.Empty;
-    }
-
-    public class SearchViewModelData
-    {
-        public int CurrentPage { get; set; }
-        public int TotalPages { get; set; }
-        public List<NewsItemData> NewsItems { get; set; } = new List<NewsItemData>();
-    }
-
-    // ======================================================
-    //  POST request အတွက် Request Body Model
-    // ======================================================
     public class CreateServiceRequest
     {
         public string Name { get; set; } = string.Empty;
@@ -41,7 +20,7 @@ namespace MyProject.Controllers
 
     // ======================================================
     //  ServicesApiController
-    
+
     public class ServicesApiController : UmbracoApiController
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -49,6 +28,9 @@ namespace MyProject.Controllers
 
         // Services (What We Do) Page ၏ GUID
         private static readonly Guid ServicesPageGuid = Guid.Parse("513b1e17-78a1-4431-9f93-409c35af373a");
+
+        // News and Events Page ၏ GUID
+        private static readonly Guid NewsPageGuid = Guid.Parse("5de81975-a4ae-4273-9493-05f3a7cd4d63");
 
         // News & Events Document Type Alias
         private const string NewsItemAlias = "newsAndEventsItem";
@@ -85,7 +67,7 @@ namespace MyProject.Controllers
         }
 
         // ============================================================
-        //  GET /umbraco/api/services/getnews?page=1&lang=en-US
+        //  GET /umbraco/api/servicesapi/getnews?page=1&lang=en-US
         // ============================================================
         [HttpGet]
         public IActionResult GetNews(int page = 1, string lang = "en-US")
@@ -93,12 +75,10 @@ namespace MyProject.Controllers
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var context))
                 return BadRequest();
 
-            // Home Page ID: 1058 မှတစ်ဆင့် News Landing Page ကို ရှာသည်
-            var root = context.Content.GetById(1058);
-            if (root == null) return NotFound(new { message = "Root not found." });
-
-            var newsLandingPage = root.Children?.FirstOrDefault(x => x.ContentType.Alias == "newsAndEvents");
-            if (newsLandingPage == null) return NotFound(new { message = "News landing page not found." });
+            // ✅ GUID သုံး — hardcoded ID မသုံးပါ
+            var newsLandingPage = context.Content.GetById(NewsPageGuid);
+            if (newsLandingPage == null)
+                return NotFound(new { message = "News and Events page not found." });
 
             var allNews = newsLandingPage.Children?
                 .Where(x => x.IsVisible())
@@ -116,7 +96,7 @@ namespace MyProject.Controllers
 
                 return new
                 {
-                    title = item.Name(lang) ?? item.Name,
+                    title = item.Name,                                          // ✅ Name က property သာဖြစ်သည်
                     description = item.Value<string>("description", culture: lang) ?? "",
                     url = item.Url(culture: lang),
                     imageUrl = img?.Url() ?? ""

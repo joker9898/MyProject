@@ -225,7 +225,7 @@
                     // ====================================================================
                     async function fetchServicesFromAPI() {
                     try {
-                    const response = await fetch('/umbraco/api/services/getservices');
+                    const response = await fetch('/umbraco/api/servicesapi/getservices');
                     const services = await response.json();
 
                     const listContainer = document.getElementById('api-data-list');
@@ -252,12 +252,6 @@
                     }
                     }
 
-                    // ====================================================================
-                    // ၂။ Latest News များကို API ကနေ ဆွဲထုတ်မည့် Function
-                    // ====================================================================
-                    // ====================================================================
-                    // ၂။ Latest News များကို API ကနေ ဆွဲထုတ်မည့် Function (Pagination ပါဝင်သည်)
-                    // ====================================================================
                     let currentNewsPage = 1;
 
                     async function fetchNewsFromAPI(page = 1) {
@@ -359,7 +353,7 @@
                     // Function တွေ စတင် Run မည် (ဒါလေး အောက်ဆုံးမှာ ရှိဖို့ သေချာပါစေ)
                     fetchServicesFromAPI(); // Services အတွက်
                     fetchNewsFromAPI(1);    // News အတွက်
-
+                    @RenderSection("Scripts", required: false)
                 </script>
             </body>
 
