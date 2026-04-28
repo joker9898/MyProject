@@ -6,7 +6,7 @@
     var bannerImage = Model.Value<IPublishedContent>("bannerImage");
 }
 
-@* Banner Image *@
+@* Banner *@
 @if (bannerImage != null)
 {
     <div class="full-banner" style="height:250px;">
@@ -16,22 +16,109 @@
 
 <div class="container section-container">
 
-    <div class="home-section-header mb-4">
+    @* Header + Filter Button *@
+    <div class="d-flex justify-content-between align-items-center mb-4" style="position:relative;">
         <h2 class="home-section-title">@title</h2>
+        <button id="filter-toggle-btn" onclick="toggleFilter()" style="background:#b82a2a; color:#fff; border:none; padding:10px 22px;
+            border-radius:6px; font-weight:700; font-size:0.9rem;
+            cursor:pointer; display:flex; align-items:center; gap:8px;">
+            Filter ▼
+        </button>
     </div>
 
-    @* Cards — JS ဖြင့် inject ဖြစ်မည် *@
+    @* Filter Panel (hidden by default) *@
+    <div id="filter-panel" style="display:none; background:#fff; border:1px solid #e0e0e0;
+        border-radius:12px; padding:28px; margin-bottom:30px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+            @* Topic *@
+            <div>
+                <label style="font-weight:700; color:#b82a2a; display:block; margin-bottom:6px;">Topic</label>
+                <select id="filter-topic" style="width:100%; padding:10px; border:1px solid #ddd;
+                    border-radius:6px; font-size:0.9rem;">
+                    <option value="">-- All Topics --</option>
+                    <option value="climate">Climate</option>
+                    <option value="disaster">Disaster</option>
+                    <option value="technology">Technology</option>
+                    <option value="training">Training</option>
+                    <option value="partnership">Partnership</option> 
+                    <option value="capacity building">Capacity Building</option>
+                </select>
+            </div>
+
+            @* Country *@
+            <div>
+                <label style="font-weight:700; color:#b82a2a; display:block; margin-bottom:6px;">Country</label>
+                <select id="filter-country" style="width:100%; padding:10px; border:1px solid #ddd;
+                    border-radius:6px; font-size:0.9rem;">
+                    <option value="">-- All Countries --</option>
+                    <option value="myanmar">Myanmar</option>
+                    <option value="thailand">Thailand</option>
+                    <option value="vietnam">Vietnam</option>
+                    <option value="cambodia">Cambodia</option>
+                    <option value="laos">Laos</option>
+                </select>
+            </div>
+
+            @* From Date *@
+            <div>
+                <label style="font-weight:700; color:#b82a2a; display:block; margin-bottom:6px;">From</label>
+                <input type="date" id="filter-from" style="width:100%; padding:10px; border:1px solid #ddd;
+                border-radius:6px; font-size:0.9rem;" />
+            </div>
+
+            @* To Date *@
+            <div>
+                <label style="font-weight:700; color:#b82a2a; display:block; margin-bottom:6px;">To</label>
+                <input type="date" id="filter-to" style="width:100%; padding:10px; border:1px solid #ddd;
+                border-radius:6px; font-size:0.9rem;" />
+            </div>
+
+        </div>
+
+        @* Language *@
+        <div style="margin-top:20px;">
+            <label style="font-weight:700; color:#b82a2a; display:block; margin-bottom:6px;">Language :</label>
+            <select id="filter-lang" style="width:100%; padding:10px; border:1px solid #ddd;
+                border-radius:6px; font-size:0.9rem;">
+                <option value="">-- All Languages --</option>
+                <option value="en-US">English</option>
+                <option value="my-MM">Burmese (မြန်မာ)</option>
+            </select>
+        </div>
+
+        @* Search Button *@
+        <div style="text-align:right; margin-top:24px;">
+            <button onclick="applyFilter()" style="background:#b82a2a; color:#fff; border:none;
+                padding:12px 32px; border-radius:6px;
+                font-weight:700; font-size:0.95rem; cursor:pointer;">
+                Search
+            </button>
+            <button onclick="resetFilter()" style="background:#f0f0f0; color:#555; border:none;
+                padding:12px 20px; border-radius:6px;
+                font-weight:600; font-size:0.9rem; cursor:pointer; margin-left:10px;">
+                Reset
+            </button>
+        </div>
+    </div>
+
+    @* News Cards — JS inject *@
     <div class="home-card-grid" id="news-result-container">
         <p class="home-empty">Loading news...</p>
     </div>
 
-    @* Pagination — JS ဖြင့် inject ဖြစ်မည် *@
+    @* Pagination — JS inject *@
     <div id="news-pagination" class="d-flex justify-content-center mt-4 flex-wrap gap-1">
     </div>
 
 </div>
 
-@* News_List.js ကို ဤ page တွင်သာ load မည် *@
 @section Scripts {
+    @* Current page ရဲ့ culture ကို JS သို့ ပေးပို့မည် *@
+    <script>
+        var currentCulture = '@System.Threading.Thread.CurrentThread.CurrentCulture.Name';
+    </script>
     <script src="/js/News_List.js"></script>
 }
